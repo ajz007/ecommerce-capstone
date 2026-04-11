@@ -1,0 +1,110 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3333:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9094:9094"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: capstone-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    ports:
+      - "8090:8080"
+
+  auth-service:
+    build:
+      context: ./UserAuth
+    container_name: auth-service
+    depends_on:
+      - mysql
+    environment:
+      SERVER_PORT: 8082
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: auth_db
+      DB_USER: root
+      DB_PASSWORD: root
+      JWT_SECRET: change-this-to-a-local-dev-secret-key-12345
+      JWT_EXPIRATION_SECONDS: 3600
+    ports:
+      - "8082:8082"
+
+  product-catalog-service:
+    build:
+      context: ./ProductCatalog
+    container_name: product-catalog-service
+    depends_on:
+      - mysql
+    environment:
+      SERVER_PORT: 8081
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: product_db
+      DB_USER: root
+      DB_PASSWORD: root
+    ports:
+      - "8081:8081"
+
+  cart-order-service:
+    build:
+      context: ./CartOrder
+    container_name: cart-order-service
+    depends_on:
+      - mysql
+      - kafka
+      - product-catalog-service
+    environment:
+      SERVER_PORT: 8083
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: order_db
+      DB_USER: root
+      DB_PASSWORD: root
+      JWT_SECRET: change-this-to-a-local-dev-secret-key-12345
+      JWT_EXPIRATION_SECONDS: 3600
+      PRODUCT_CATALOG_BASE_URL: http://product-catalog-service:8081
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP_ID: cart-order-service
+      KAFKA_TOPIC_ORDER_CREATED: order.created
+    ports:
+      - "8083:8083"
+
+volumes:
+  mysql-data:
