@@ -33,6 +33,7 @@ Cart:
 
 Checkout and orders:
 
+- `GET /checkout/preview`
 - `POST /checkout`
 - `GET /orders`
 - `GET /orders/{orderId}`

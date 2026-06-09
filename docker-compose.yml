@@ -120,6 +120,8 @@ services:
       JWT_SECRET: change-this-to-a-local-dev-secret-key-12345
       JWT_EXPIRATION_SECONDS: 3600
       PRODUCT_CATALOG_BASE_URL: http://product-catalog-service:8081
+      CHECKOUT_TAX_RATE: 0.18
+      CHECKOUT_SHIPPING_FEE: 0.00
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KAFKA_CONSUMER_GROUP_ID: cart-order-service
       KAFKA_TOPIC_ORDER_CREATED: order.created

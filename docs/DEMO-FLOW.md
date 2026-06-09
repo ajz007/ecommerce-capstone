@@ -57,23 +57,47 @@ curl http://localhost:8083/cart \
   -H "Authorization: Bearer <token>"
 ```
 
-## 6. Checkout
+## 6. Preview checkout
 
 ```bash
-curl -X POST http://localhost:8083/checkout \
+curl http://localhost:8083/checkout/preview \
   -H "Authorization: Bearer <token>"
 ```
 
-## 7. View order history
+The preview revalidates current catalog prices and stock, then returns subtotal, tax, shipping,
+discount, and final total.
+
+## 7. Checkout
+
+```bash
+curl -X POST http://localhost:8083/checkout \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "paymentMethod": "UPI",
+    "simulateSuccess": true,
+    "shippingAddress": {
+      "fullName": "Demo User",
+      "addressLine1": "12 Main Street",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "postalCode": "560001",
+      "country": "India",
+      "phone": "+91 9876543210"
+    }
+  }'
+```
+
+## 8. View order history
 
 ```bash
 curl http://localhost:8083/orders \
   -H "Authorization: Bearer <token>"
 ```
 
-## 8. Verify Kafka demo
+## 9. Verify Kafka demo
 
-After checkout:
+After a successful checkout:
 
 - `CartOrder` publishes `order.created`
 - Kafka listener logs the consumed event
