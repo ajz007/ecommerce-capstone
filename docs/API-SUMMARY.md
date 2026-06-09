@@ -2,7 +2,7 @@
 
 ## Auth Service
 
-Base URL: `http://localhost:8082`
+Base URL: `http://localhost:8082/swagger-ui/index.html`
 
 - `POST /auth/signup`
 - `POST /auth/login`

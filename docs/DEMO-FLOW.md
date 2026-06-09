@@ -6,15 +6,7 @@
 docker compose up --build
 ```
 
-## 2. Create a user
-
-```bash
-curl -X POST http://localhost:8082/auth/signup \
-  -H "Content-Type: application/json" \
-  -d "{\"fullName\":\"Demo User\",\"email\":\"demo@example.com\",\"password\":\"password123\"}"
-```
-
-## 3. Login
+## 2. Login with the demo user
 
 ```bash
 curl -X POST http://localhost:8082/auth/login \
@@ -24,13 +16,32 @@ curl -X POST http://localhost:8082/auth/login \
 
 Copy the returned `accessToken`.
 
-## 4. Browse products
+To test signup separately, use a different email:
 
 ```bash
-curl http://localhost:8081/products
+curl -X POST http://localhost:8082/auth/signup \
+  -H "Content-Type: application/json" \
+  -d "{\"fullName\":\"New User\",\"email\":\"new.user@example.com\",\"password\":\"password123\"}"
 ```
 
-## 5. Add items to cart
+## 3. Browse products
+
+```bash
+curl http://localhost:8081/products \
+  -H "Authorization: Bearer <token>"
+```
+
+Optional filter examples:
+
+```bash
+curl "http://localhost:8081/products?search=iphone" \
+  -H "Authorization: Bearer <token>"
+
+curl "http://localhost:8081/products?category=electronics" \
+  -H "Authorization: Bearer <token>"
+```
+
+## 4. Add items to cart
 
 ```bash
 curl -X POST http://localhost:8083/cart/items \
@@ -39,28 +50,28 @@ curl -X POST http://localhost:8083/cart/items \
   -d "{\"productId\":1,\"quantity\":2}"
 ```
 
-## 6. View cart
+## 5. View cart
 
 ```bash
 curl http://localhost:8083/cart \
   -H "Authorization: Bearer <token>"
 ```
 
-## 7. Checkout
+## 6. Checkout
 
 ```bash
 curl -X POST http://localhost:8083/checkout \
   -H "Authorization: Bearer <token>"
 ```
 
-## 8. View order history
+## 7. View order history
 
 ```bash
 curl http://localhost:8083/orders \
   -H "Authorization: Bearer <token>"
 ```
 
-## 9. Verify Kafka demo
+## 8. Verify Kafka demo
 
 After checkout:
 
