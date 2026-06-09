@@ -18,12 +18,19 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    healthcheck:
+      test: ["CMD", "cub", "zk-ready", "localhost", "2181"]
+      interval: 5s
+      timeout: 35s
+      retries: 5
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     container_name: kafka
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
+    restart: on-failure:5
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -35,12 +42,19 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     ports:
       - "9094:9094"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 10s
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     environment:
       KAFKA_CLUSTERS_0_NAME: capstone-local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
@@ -87,9 +101,12 @@ services:
       context: ./CartOrder
     container_name: cart-order-service
     depends_on:
-      - mysql
-      - kafka
-      - product-catalog-service
+      mysql:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      product-catalog-service:
+        condition: service_started
     environment:
       SERVER_PORT: 8083
       DB_HOST: mysql
