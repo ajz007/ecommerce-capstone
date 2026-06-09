@@ -2,7 +2,7 @@
 
 ## Auth Service
 
-Base URL: `http://localhost:8082/swagger-ui/index.html`
+Swagger: `http://localhost:8082/swagger-ui/index.html`
 
 - `POST /auth/signup`
 - `POST /auth/login`
@@ -10,7 +10,7 @@ Base URL: `http://localhost:8082/swagger-ui/index.html`
 
 ## Product Catalog Service
 
-Base URL: `http://localhost:8081`
+Swagger: `http://localhost:8081/swagger-ui/index.html`
 
 - `GET /products`
 - `GET /products/{id}`
@@ -21,7 +21,7 @@ Base URL: `http://localhost:8081`
 
 ## Cart and Order Service
 
-Base URL: `http://localhost:8083`
+Swagger: `http://localhost:8083/swagger-ui/index.html`
 
 Cart:
 

@@ -1,9 +1,9 @@
 [submodule "ProductCatalog"]
 	path = ProductCatalog
-	url = git@github.com:ajz007/productscatalog.git
+	url = https://github.com/ajz007/productscatalog.git
 [submodule "CartOrder"]
 	path = CartOrder
-	url = git@github.com:ajz007/CartOrder.git
+	url = https://github.com/ajz007/CartOrder.git
 [submodule "UserAuth"]
 	path = UserAuth
-	url = git@github.com:ajz007/UserAuth.git
+	url = https://github.com/ajz007/UserAuth.git

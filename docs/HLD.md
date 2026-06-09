@@ -18,7 +18,9 @@
 
 - Owns carts, checkout, orders, and Kafka event publishing/consumption
 - Validates JWT locally using the shared secret
-- Calls `ProductCatalog` over HTTP to validate product data when cart items are added
+- Calls `ProductCatalog` when cart items are added and again during checkout preview/execution
+- Revalidates current prices and stock before creating an order
+- Stores product, amount, and shipping-address snapshots with completed orders
 
 ## Data Flow
 
@@ -27,8 +29,10 @@
 3. Client sends JWT to `CartOrder`
 4. `CartOrder` validates JWT locally
 5. `CartOrder` calls `ProductCatalog` when adding products to cart
-6. Checkout creates an order and publishes `order.created`
-7. Kafka consumer logs the event and stores a simple audit row
+6. Checkout preview recalculates the payable amount using current catalog data
+7. Checkout locks the cart, snapshots order data, and simulates payment
+8. Successful payment marks the cart checked out and publishes `order.created`
+9. Kafka consumer logs the event and stores a simple audit row
 
 ## Storage
 
